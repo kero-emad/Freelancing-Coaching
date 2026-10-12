@@ -69,7 +69,7 @@
         body.fullscreen-mode .kicker { font-size: 0.9rem !important; }
         body.fullscreen-mode img:not(.profile-img):not(.brand-logo):not(.presenter-img) { max-height: 50vh !important; }
         body.fullscreen-mode .brand-logo { max-height: 5rem !important; width: auto !important; }
-        body.fullscreen-mode .presenter-img { height: 10rem !important; width: 10rem !important; }
+        body.fullscreen-mode .presenter-img { height: 13rem !important; width: 8.5rem !important; }
         body.fullscreen-mode .tip-number { height: 3.5rem !important; width: 3.5rem !important; font-size: 1.6rem !important; }
         body.fullscreen-mode .slide-footer { font-size: 1rem !important; margin-top: 0.75rem !important; }
     </style>
@@ -78,7 +78,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-        <aside class="lg:col-span-1 bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-col justify-between max-h-[calc(100vh-140px)] overflow-y-auto">
+        <aside class="order-2 lg:order-1 lg:col-span-1 bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-col justify-between max-h-64 lg:max-h-[calc(100vh-140px)] overflow-y-auto">
             <div>
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 px-2 flex justify-between items-center">
                     <span>Slide Navigation</span>
@@ -91,11 +91,11 @@
             </div>
         </aside>
 
-        <section class="lg:col-span-3 flex flex-col gap-6">
-            <div id="slide-viewport" class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-6 md:p-10 min-h-[500px] flex flex-col justify-between relative shadow-2xl overflow-hidden">
+        <section class="order-1 lg:order-2 lg:col-span-3 flex flex-col gap-6">
+            <div id="slide-viewport" class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-5 sm:p-6 md:p-10 min-h-[420px] md:min-h-[500px] flex flex-col justify-between relative shadow-2xl overflow-hidden">
                 <div id="slide-progress-bar" class="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 transition-all duration-300 z-30" style="width: 0%"></div>
 
-                <div id="corner-logos" class="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gray-800 flex items-center justify-center gap-3">
+                <div id="corner-logos" class="absolute top-3 right-3 md:top-4 md:right-4 z-20 bg-white/95 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-xl border border-gray-800 flex items-center justify-center gap-2 md:gap-3">
                     <img src="depi.jpeg" class="brand-logo h-6 md:h-8 w-auto object-contain" alt="DEPI">
                     <span class="h-6 w-px bg-gray-300"></span>
                     <img src="freelance%20yard.jpeg" class="brand-logo h-6 md:h-8 w-auto object-contain" alt="Freelance Yard">
@@ -106,21 +106,21 @@
 
                 <div id="slide-body" class="relative z-10 flex-grow flex flex-col justify-center slide-fade-enter slide-fade-active"></div>
 
-                <div class="slide-footer mt-4 pt-2 border-t border-gray-800/40 flex justify-between items-center text-xs text-slate-500 relative z-10">
+                <div class="slide-footer mt-4 pt-2 border-t border-gray-800/40 flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center text-center sm:text-left text-[10px] sm:text-xs text-slate-500 relative z-10">
                     <span class="font-light">Freelancing Coaching</span>
-                    <span class="font-mono text-slate-400">Presented by Kerolos Emad Saad</span>
+                    <a href="https://freelancing-coaching.vercel.app/" target="_blank" class="font-mono text-orange-400 hover:text-orange-300 transition break-all">freelancing-coaching.vercel.app</a>
                 </div>
             </div>
 
             <div id="controls-toolbar" class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-row items-center justify-between shadow-xl">
                 <div class="flex items-center gap-2 w-full justify-between sm:justify-start flex-wrap">
-                    <button onclick="prevSlide()" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2">
+                    <button onclick="prevSlide()" class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2">
                         <i class="fa-solid fa-chevron-left text-orange-500"></i> Prev
                     </button>
-                    <button onclick="nextSlide()" class="px-5 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 shadow-lg shadow-orange-600/15">
+                    <button onclick="nextSlide()" class="flex-1 sm:flex-none justify-center px-5 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 shadow-lg shadow-orange-600/15">
                         Next <i class="fa-solid fa-chevron-right"></i>
                     </button>
-                    <button onclick="toggleFullscreen()" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 sm:ml-auto">
+                    <button onclick="toggleFullscreen()" class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 sm:ml-auto">
                         <i class="fa-solid fa-expand text-orange-500"></i> Fullscreen
                     </button>
                 </div>
@@ -129,6 +129,8 @@
     </main>
 
     <script>
+        const QR_URL = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://freelancing-coaching.vercel.app/";
+
         const slidesData = [
             {
                 id: 1,
@@ -137,6 +139,7 @@
                 heading: "Freelancing Coaching",
                 tagline: "From learning to earning — turn your skills into real, paid projects.",
                 presenter: "Kerolos Emad Saad",
+                qr: QR_URL,
                 image: "f573fe70-9005-440b-90e6-de67ae80356a.png",
                 logos: [
                     { src: "depi.jpeg", alt: "DEPI" },
@@ -406,7 +409,8 @@
                 layout: "thankyou",
                 heading: "Thank You!",
                 message: "Now it is your turn. Start with one small step today.",
-                presenter: "Kerolos Emad Saad"
+                presenter: "Kerolos Emad Saad",
+                qr: QR_URL
             }
         ];
 
@@ -478,10 +482,21 @@
                             '<div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>' +
                             '<p class="text-slate-300 text-base md:text-xl font-light leading-relaxed max-w-2xl">' + slide.tagline + '</p>' +
                         '</div>' +
-                        '<div class="relative z-10 mt-6 flex flex-col items-center gap-2 bg-gray-900/60 border border-gray-800/80 px-8 py-5 rounded-2xl">' +
-                            '<img src="' + slide.image + '" class="presenter-img h-32 w-32 md:h-40 md:w-40 rounded-2xl object-contain bg-[#0b0f19] border border-orange-500/30 mx-auto" alt="' + slide.presenter + '">' +
-                            '<p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Presented By</p>' +
-                            '<p class="text-lg md:text-xl font-bold text-white text-center">' + slide.presenter + '</p>' +
+                        '<div class="relative z-10 mt-6 flex flex-col sm:flex-row items-stretch justify-between gap-6 sm:gap-12 w-full">' +
+                            '<div class="flex-1 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-gray-900/80 to-[#0b0f19] border border-gray-800/80 px-8 py-6 rounded-3xl">' +
+                                '<div class="relative flex items-center justify-center">' +
+                                    '<div class="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 blur-md opacity-60"></div>' +
+                                    '<img src="' + slide.image + '" class="presenter-img relative h-40 w-28 md:h-48 md:w-32 rounded-[50%] object-cover border-4 border-[#0b0f19] shadow-lg" alt="' + slide.presenter + '">' +
+                                '</div>' +
+                                '<div class="text-center">' +
+                                    '<p class="text-[10px] uppercase tracking-[0.25em] text-orange-400 font-bold">Presented By</p>' +
+                                    '<p class="text-lg md:text-xl font-bold text-white">' + slide.presenter + '</p>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="flex flex-col items-center justify-center gap-3 bg-white px-6 py-6 rounded-3xl shadow-xl">' +
+                                '<img src="' + slide.qr + '" class="qr-img h-28 w-28 md:h-36 md:w-36 rounded-xl" alt="QR code">' +
+                                '<p class="text-[10px] uppercase tracking-[0.2em] text-gray-700 font-bold text-center max-w-[9rem]">Scan to open the slides</p>' +
+                            '</div>' +
                         '</div>' +
                         '<button onclick="nextSlide()" class="relative z-10 mt-1 px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white rounded-xl text-sm font-bold uppercase tracking-wider transition duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-orange-600/20 flex items-center gap-3">' +
                             'Start Presentation <i class="fa-solid fa-circle-play animate-pulse"></i>' +
@@ -644,6 +659,10 @@
                         '<div class="relative z-10 mt-4 flex items-center gap-3 bg-gray-900/60 border border-gray-800 px-6 py-3 rounded-2xl">' +
                             '<i class="fa-solid fa-hands-clapping text-orange-500 text-xl"></i>' +
                             '<span class="text-white font-bold text-lg">' + slide.presenter + '</span>' +
+                        '</div>' +
+                        '<div class="relative z-10 flex flex-col items-center gap-2 bg-white px-5 py-4 rounded-2xl shadow-xl">' +
+                            '<img src="' + slide.qr + '" class="qr-img h-32 w-32 md:h-40 md:w-40" alt="QR code">' +
+                            '<p class="text-[10px] uppercase tracking-wider text-gray-700 font-bold">Scan to open the slides</p>' +
                         '</div>' +
                     '</div>';
             }
