@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -71,6 +71,7 @@
         body.fullscreen-mode .brand-logo { max-height: 5rem !important; width: auto !important; }
         body.fullscreen-mode .presenter-img { height: 13rem !important; width: 8.5rem !important; }
         body.fullscreen-mode .tip-number { height: 3.5rem !important; width: 3.5rem !important; font-size: 1.6rem !important; }
+        body.fullscreen-mode .step-number { height: 3.5rem !important; width: 3.5rem !important; font-size: 1.6rem !important; }
         body.fullscreen-mode .slide-footer { font-size: 1rem !important; margin-top: 0.75rem !important; }
     </style>
 </head>
@@ -82,7 +83,7 @@
             <div>
                 <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 px-2 flex justify-between items-center">
                     <span>Slide Navigation</span>
-                    <span id="slide-count-indicator" class="text-orange-500 font-mono">1/24</span>
+                    <span id="slide-count-indicator" class="text-orange-500 font-mono">1/29</span>
                 </h2>
                 <nav id="slide-list-nav" class="space-y-1"></nav>
             </div>
@@ -137,7 +138,7 @@
                 title: "Welcome",
                 layout: "title",
                 heading: "Freelancing Coaching",
-                tagline: "From learning to earning — turn your skills into real, paid projects.",
+                tagline: "From learning to earning” turn your skills into real, paid projects.",
                 presenter: "Kerolos Emad Saad",
                 qr: QR_URL,
                 image: "f573fe70-9005-440b-90e6-de67ae80356a.png",
@@ -179,7 +180,7 @@
                 kicker: "Our rules",
                 bullets: [
                     "Doing the work matters more than just attending.",
-                    "Be honest about your level — this is a check-up, not a judgment.",
+                    "Be honest about your level” this is a check-up, not a judgment.",
                     "Ask for feedback early, then use it.",
                     "Apply only to good-fit jobs, not random ones.",
                     "Track your actions, replies, lessons, and next steps.",
@@ -355,8 +356,8 @@
                 why: "Morning is prime time, because many new jobs appear then."
             },
             {
-                id: 20,
-                title: "A Strong Proposal — 5 Parts",
+                id: 25,
+                title: "A Strong Proposal-” 5 Parts",
                 slideTitle: "A Strong Proposal Has 5 Parts",
                 layout: "parts",
                 kicker: "Proposal structure",
@@ -369,18 +370,76 @@
                 ]
             },
             {
-                id: 21,
+                id: 26,
                 title: "Your Service in One Sentence",
                 slideTitle: "Can You Explain Your Service in One Sentence?",
                 layout: "sentence",
                 kicker: "Positioning",
                 formula: "I help [who] get [result] using [skill].",
-                exampleLabel: "Example",
                 example: "I help small businesses clean their sales data and build simple Excel reports.",
                 turn: "YOUR TURN: write your own one sentence. If it is not clear, fix it before applying to more jobs."
             },
             {
-                id: 22,
+                id: 27,
+                title: "Step 1 - A Clear Title",
+                type: "step", n: "1",
+                stepTitle: "Make Your Title Grab Attention",
+                lead: "Your title is the first thing the client sees. It should answer one question fast: what will you do for me?",
+                points: [
+                    "Say clearly what you will do, and for whom.",
+                    "Add one benefit: speed or quality."
+                ]
+            },
+            {
+                id: 28,
+                title: "Step 2 - Clear Steps",
+                type: "step", n: "2",
+                stepTitle: "Break Your Service Into Simple Steps",
+                lead: "Clients want to know what they are paying for. Show them each step, from start to delivery.",
+                points: [
+                    "Use a simple numbered list.",
+                    "Keep every step short and clear.",
+                    "Cover the full journey to final delivery."
+                ]
+            },
+            {
+                id: 29,
+                title: "Step 3 - Price & Time",
+                type: "step", n: "3",
+                stepTitle: "State the Price and Time Clearly",
+                lead: "A clear price and delivery time remove doubt and let the client order with confidence.",
+                points: [
+                    "Show the price with no hidden costs.",
+                    "Say exactly when you will deliver.",
+                    "If it varies, give a clear range."
+                ]
+            },
+            {
+                id: 30,
+                title: "Step 4 - Ask Up Front",
+                type: "step", n: "4",
+                stepTitle: "Ask for What You Need Up Front",
+                lead: "Ask your questions before the project starts, not in the middle, to save time.",
+                points: [
+                    "List the files or links you need.",
+                    "Give the client a simple checklist.",
+                    "Get everything at once."
+                ]
+            },
+            {
+                id: 31,
+                title: "Step 5 - Professional Visual",
+                type: "step", n: "5",
+                stepTitle: "Add a Professional Thumbnail or Video",
+                lead: "Good looks attract attention. A clean cover image or a short video makes your service stand out.",
+                points: [
+                    "Use a clean, organized cover image.",
+                    "Or add a short video of your work.",
+                    "Keep it tidy and professional."
+                ]
+            },
+            {
+                id: 32,
                 title: "Readiness Classification",
                 slideTitle: "Readiness Classification",
                 layout: "classify",
@@ -392,7 +451,7 @@
                 ]
             },
             {
-                id: 23,
+                id: 33,
                 title: "Your Action Plan",
                 slideTitle: "Your Action Plan Before Session 2",
                 layout: "action",
@@ -404,7 +463,7 @@
                 ]
             },
             {
-                id: 24,
+                id: 34,
                 title: "Thank You",
                 layout: "thankyou",
                 heading: "Thank You!",
@@ -571,7 +630,7 @@
                     '<div class="flex items-center gap-4">' +
                         '<div class="tip-number h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shadow-orange-600/30">' + slide.n + '</div>' +
                         '<div>' +
-                            kicker(slide.repeat ? 'Mostaql Tips · Tip ' + slide.n + ' of 12 · Repeated on purpose' : 'Mostaql Tips · Tip ' + slide.n + ' of 12') +
+                            kicker(slide.repeat ? 'Mostaql Tips· Tip ' + slide.n + ' of 12 · Repeated on purpose' : 'Mostaql Tips · Tip ' + slide.n + ' of 12') +
                             '<h2 class="text-2xl md:text-4xl font-serif font-bold text-white leading-tight">' + slide.tipTitle + '</h2>' +
                         '</div>' +
                     '</div>' +
@@ -589,6 +648,28 @@
                         '<i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>' +
                         '<span class="text-base md:text-lg leading-relaxed"><span class="font-bold">Why it matters: </span>' + slide.why + '</span>' +
                     '</div>' +
+                '</div>';
+            }
+
+            if (slide.type === 'step') {
+                const points = slide.points.map(p =>
+                    '<li class="flex items-start gap-3 bg-gray-900/60 border border-gray-800 rounded-xl p-4">' +
+                        '<i class="fa-solid fa-circle-check text-orange-500 mt-1 shrink-0"></i>' +
+                        '<span class="text-slate-200 text-base md:text-lg leading-relaxed">' + p + '</span>' +
+                    '</li>'
+                ).join('');
+                return '<div class="flex flex-col gap-5 max-w-4xl mx-auto py-2 w-full">' +
+                    '<div class="flex items-center gap-4">' +
+                        '<div class="step-number h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shadow-orange-600/30">' + slide.n + '</div>' +
+                        '<div>' +
+                            kicker('Building a Winning Service· Step ' + slide.n + ' of 5') +
+                            '<h2 class="text-xl md:text-3xl font-serif font-bold text-white leading-tight">' + slide.stepTitle + '</h2>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-5 md:p-6">' +
+                        '<p class="text-slate-300 text-base md:text-lg leading-relaxed">' + slide.lead + '</p>' +
+                    '</div>' +
+                    '<ul class="grid grid-cols-1 md:grid-cols-2 gap-3">' + points + '</ul>' +
                 '</div>';
             }
 
@@ -731,3 +812,5 @@
     </script>
 </body>
 </html>
+
+
