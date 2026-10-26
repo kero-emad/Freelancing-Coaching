@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Communication — Freelancing Coaching</title>
+    <meta name="description" content="دليل التعامل مع العميل من أول رسالة لحد تسليم المشروع — Freelancing Coaching">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Cairo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b0f19
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f97316
+        }
+
+        .slide-fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all .3s ease-out
+        }
+
+        .slide-fade-active {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        body.fullscreen-mode {
+            overflow: hidden
+        }
+
+        body.fullscreen-mode main {
+            grid-template-columns: 1fr !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100vw !important;
+            width: 100vw !important;
+            height: 100vh !important
+        }
+
+        body.fullscreen-mode aside {
+            display: none !important
+        }
+
+        body.fullscreen-mode section {
+            grid-column: span 4/span 4 !important;
+            height: 100vh !important;
+            gap: 0 !important
+        }
+
+        body.fullscreen-mode #slide-viewport {
+            border: none !important;
+            border-radius: 0 !important;
+            height: 100vh !important;
+            min-height: 100vh !important;
+            width: 100vw !important;
+            padding: 2.5rem 3.5rem 1.5rem !important
+        }
+
+        body.fullscreen-mode #controls-toolbar {
+            display: none !important
+        }
+
+        body.fullscreen-mode #slide-body {
+            overflow-y: auto !important;
+            justify-content: flex-start !important
+        }
+
+        body.fullscreen-mode #slide-body>div {
+            margin-top: auto;
+            margin-bottom: auto
+        }
+
+        body.fullscreen-mode h2 {
+            font-size: 3rem !important;
+            line-height: 1.15 !important
+        }
+
+        body.fullscreen-mode h3 {
+            font-size: 1.7rem !important;
+            line-height: 1.3 !important
+        }
+
+        body.fullscreen-mode p,
+        body.fullscreen-mode li,
+        body.fullscreen-mode blockquote,
+        body.fullscreen-mode span:not(.font-mono) {
+            font-size: 1.25rem !important;
+            line-height: 1.9rem !important
+        }
+
+        body.fullscreen-mode .kicker {
+            font-size: .9rem !important
+        }
+
+        body.fullscreen-mode .rule-num {
+            height: 3.5rem !important;
+            width: 3.5rem !important;
+            font-size: 1.6rem !important
+        }
+
+        body.fullscreen-mode .slide-footer {
+            font-size: 1rem !important;
+            margin-top: .75rem !important
+        }
+
+        /* RTL fixes for fullscreen */
+        body.fullscreen-mode .brand-logo {
+            max-height: 5rem !important;
+            width: auto !important
+        }
+
+        .rtl-text {
+            direction: rtl;
+            text-align: right
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Cairo', 'sans-serif'], serif: ['Playfair Display', 'serif'] } } } }
+    </script>
+</head>
+
+<body
+    class="bg-[#030712] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white overflow-x-hidden font-sans"
+    style="font-family:'Cairo',sans-serif">
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <aside
+            class="order-2 lg:order-1 lg:col-span-1 bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-col justify-between max-h-64 lg:max-h-[calc(100vh-140px)] overflow-y-auto">
+            <div>
+                <h2
+                    class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 px-2 flex justify-between items-center">
+                    <span>Slide Navigation</span>
+                    <span id="slide-count-indicator" class="text-orange-500 font-mono">1/22</span>
+                </h2>
+                <nav id="slide-list-nav" class="space-y-1"></nav>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 text-center">
+                <p class="text-[11px] text-slate-500">Press Left / Right / Space on keyboard</p>
+            </div>
+        </aside>
+
+        <section class="order-1 lg:order-2 lg:col-span-3 flex flex-col gap-6">
+            <div id="slide-viewport"
+                class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-5 sm:p-6 md:p-10 min-h-[420px] md:min-h-[500px] flex flex-col justify-between relative shadow-2xl overflow-hidden">
+                <div id="slide-progress-bar"
+                    class="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 transition-all duration-300 z-30"
+                    style="width:0%"></div>
+                <div id="corner-logos"
+                    class="absolute top-3 right-3 md:top-4 md:right-4 z-20 bg-white/95 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-xl border border-gray-800 flex items-center justify-center gap-2 md:gap-3">
+                    <img src="depi.jpeg" class="brand-logo h-6 md:h-8 w-auto object-contain" alt="DEPI">
+                    <span class="h-6 w-px bg-gray-300"></span>
+                    <img src="freelance yard.jpeg" class="brand-logo h-6 md:h-8 w-auto object-contain"
+                        alt="Freelance Yard">
+                </div>
+                <div
+                    class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-orange-500/5 blur-3xl pointer-events-none">
+                </div>
+                <div
+                    class="absolute -bottom-45 -left-45 w-80 h-80 rounded-full bg-blue-500/5 blur-3xl pointer-events-none">
+                </div>
+                <div id="slide-body"
+                    class="relative z-10 flex-grow flex flex-col justify-center slide-fade-enter slide-fade-active">
+                </div>
+                <div
+                    class="slide-footer mt-4 pt-2 border-t border-gray-800/40 flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center text-center sm:text-left text-[10px] sm:text-xs text-slate-500 relative z-10">
+                    <span class="font-light">Freelancing Coaching</span>
+                    <a href="https://freelancing-coaching.vercel.app/" target="_blank"
+                        class="font-mono text-orange-400 hover:text-orange-300 transition break-all">freelancing-coaching.vercel.app</a>
+                </div>
+            </div>
+            <div id="controls-toolbar"
+                class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-row items-center justify-between shadow-xl">
+                <div class="flex items-center gap-2 w-full justify-between sm:justify-start flex-wrap">
+                    <button onclick="prevSlide()" id="btn-prev"
+                        class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right text-orange-500"></i> السابق
+                    </button>
+                    <button onclick="nextSlide()" id="btn-next"
+                        class="flex-1 sm:flex-none justify-center px-5 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 shadow-lg shadow-orange-600/15">
+                        التالي <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button onclick="toggleFullscreen()"
+                        class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 sm:ml-auto">
+                        <i class="fa-solid fa-expand text-orange-500"></i> Fullscreen
+                    </button>
+                    <a href="home.html"
+                        class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-house text-orange-500"></i> الرئيسية
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const slides = [
+            { id: 1, nav: 'Cover — الغلاف', layout: 'cover' },
+            { id: 2, nav: 'رحلة المشروع', layout: 'journey' },
+            { id: 3, nav: 'Rule 1 — الرد السريع', layout: 'rule', n: '1', icon: 'fa-bolt', title: 'رد على العميل بسرعة', points: ['حافظ على سرعة الاستجابة', 'ادي انطباع إنك متابع واحترافي', 'افتح باب التواصل بدل ما العميل يدور على فريلانسر تاني'], example: '"أهلًا بحضرتك، شكرًا لتواصلك معايا. هراجع تفاصيل المشروع وأرد عليك بشكل واضح في أقرب وقت."', note: '' },
+            { id: 4, nav: 'Rule 2 — خارج المنصة', layout: 'rule', n: '2', icon: 'fa-ban', title: 'لو العميل طلب التواصل خارج المنصة', points: ['لو طلب WhatsApp أو أي وسيلة تانية، متبعتش أي Contact Info خاصة بيك', 'حافظ على كل التواصل داخل المنصة'], example: '"تمام لكن سنوثق كل شيء على المنصة حفاظًا على حقوق الطرفين واحترامًا لقوانين المنصة."', note: '' },
+            { id: 5, nav: 'Rule 3 — Google Meet', layout: 'rule', n: '3', icon: 'fa-video', title: 'لو العميل طلب Google Meet', points: ['لو طلب اجتماع على Google Meet، متبعتش لينك', 'خليه هو اللي يبعت اللينك', 'رد بنفس الرد السابق بخصوص توثيق التواصل على المنصة'], example: 'استخدم نفس رد المنصة: "سنوثق كل شيء على المنصة حفاظًا على حقوق الطرفين."', note: '' },
+            { id: 6, nav: 'Rule 4 — صاحب الحساب', layout: 'rule', n: '4', icon: 'fa-user-tie', title: 'اتعامل بصفتك صاحب الحساب والمسؤول', points: ['متقدمش نفسك على إنك مجرد واجهة لفريق آخر', 'متقولش إن شباب منحة أو فريق شركة بينفذ المشروع', 'منصات العمل الحر بتتعامل مع كل Freelancer كشخص لوحده'], example: '', note: 'متعرفش نفسك كشركة أو Team كامل على منصات Freelancing.' },
+            { id: 7, nav: 'Rule 5 — ما تقبلش غير الكافي', layout: 'rule', n: '5', icon: 'fa-circle-check', title: 'ما تقبلش مشروع مش واثق إنك هتسلّمه', points: ['هل فاهم المطلوب بالكامل؟', 'هل عندك المهارات والأدوات اللازمة؟', 'هل المدة مناسبة وعندك وقت للتعديلات؟', 'هل عندك خطة بديلة لو حصلت مشكلة؟'], example: '', note: 'عدم التسليم أو التأخير ممكن يؤثر على تقييمك ومعدل التسليم على المنصة.' },
+            { id: 8, nav: 'Rule 6 — بلاش تقنية زيادة', layout: 'rule', n: '6', icon: 'fa-eye-slash', title: 'ما تدخلش العميل في تفاصيل تقنية مش محتاجها', points: ['العميل غالبًا مهتم بالنتيجة مش بالكواليس', 'وضّح له إيه اللي هيستلمه وإزاي هيفيده', 'لو سأل عن تفاصيل تقنية، جاوبه بالمستوى المناسب لخبرته'], example: 'بدلًا من: "هستخدم Framework وAPI وDatabase Architecture."\nقول: "هعمل لحضرتك Landing Page متجاوبة مع الموبايل والكمبيوتر، فيها عرض للخدمة وزر للتواصل."', note: '' },
+            { id: 9, nav: 'Rule 7 — وضّح العرض', layout: 'rule', n: '7', icon: 'fa-list-check', title: 'وضّح كل تفاصيل العرض قبل الموافقة', points: ['عدد الصفحات والأقسام', 'هل الصفحة Responsive؟', 'هل تشمل نموذج تواصل؟', 'هل رفع الموقع / ربط Domain داخل العرض؟', 'عدد التعديلات ونطاقها، ومدة التنفيذ'], example: '"العرض يشمل Landing Page واحدة متجاوبة، مع تعديلين ضمن نطاق المشروع. رفع الموقع على السيرفر غير شامل إلا لو اتفقنا."', note: 'كل ما الاتفاق كان أوضح، فرص الخلاف بتقل.' },
+            { id: 10, nav: 'Rule 8 — ورّيه مثال', layout: 'rule', n: '8', icon: 'fa-folder-open', title: 'لو العميل طلب شغل مشابه، ورّيه مثالًا', points: ['اعرض مشروعًا سابقًا مشابهًا لو متاح', 'وضّح أوجه التشابه مع متطلبات العميل', 'اشرح الفكرة بلغة بسيطة بعيدًا عن المصطلحات التقنية'], example: '"اشتغلت قبل كده على Dashboard لمتابعة الطلبات. أقدر أستفيد من نفس الخبرة في تنفيذ مشروع حضرتك."', note: '' },
+            { id: 11, nav: 'Rule 9 — Prototype', layout: 'rule', n: '9', icon: 'fa-wand-magic-sparkles', title: 'لو معندكش مثال مشابه، اعمل Prototype بسيط', points: ['مش شرط يكون عندك مشروع مطابق لكل طلب', 'استخدم AI لعمل نموذج توضيحي سريع', 'وضّح إن النموذج تجريبي وليس المنتج النهائي', 'ما تضيّعش ساعات في نموذج مجاني كامل'], example: 'مثال لتطبيق حجز: اختيار الخدمة ← اختيار الموعد ← إدخال البيانات ← تأكيد الحجز', note: 'الهدف إن العميل يفهم فكرتك، مش إنك تنفّذ المشروع كله مجانًا.' },
+            { id: 12, nav: 'Rule 10 — راجع العرض', layout: 'rule', n: '10', icon: 'fa-magnifying-glass', title: 'ما توافقش على العرض قبل ما تراجعه', points: ['وصف المشروع والسعر ومدة التنفيذ', 'المخرجات المطلوبة والتعديلات المشمولة', 'أي شروط أو متطلبات إضافية'], example: '', note: 'ما تعتمدش على كلام الشات وحده. لو فيه اختلاف، وضّحه واتفقوا قبل قبول العرض.' },
+            { id: 13, nav: 'Rule 11 — ما تبدأش قبل الاتفاق', layout: 'rule', n: '11', icon: 'fa-handshake', title: 'ما تبدأش الشغل الحقيقي قبل الاتفاق', points: ['ممكن تقدم أمثلة سابقة أو شرحًا لطريقة التنفيذ', 'أو تصورًا مبدئيًا أو Prototype محدودًا', 'لكن ما تسلّمش منتجًا كاملًا قابلًا للاستخدام قبل الاتفاق'], example: '"يسعدني أبدأ، لكن خلينا نأكد تفاصيل العرض على المنصة الأول، علشان نبقى متفقين على المطلوب والسعر والمدة."', note: '' },
+            { id: 14, nav: 'المرحلة الثانية: During', layout: 'phase', phase: 'المرحلة الثانية', ar: 'أثناء المشروع', en: 'During the Project', icon: 'fa-gears', color: 'blue' },
+            { id: 15, nav: 'Rule 12 — ابعت تحديثات', layout: 'rule', n: '12', icon: 'fa-bell', title: 'ابعت تحديثات للعميل أثناء التنفيذ', points: ['ما تسيبش العميل من غير أخبار لعدة أيام', 'ابعت تحديثات في المراحل المهمة', 'وضّح إيه اللي خلص وإيه اللي فاضل', 'اطلب الملفات أو المعلومات الناقصة بدري'], example: '"أهلًا، حبيت أبلغك إننا خلصنا المرحلة الأولى. هشارك التحديث القادم في الموعد المتفق عليه."', note: 'الهدف إن العميل يفضل مطمئن وعارف حالة المشروع.' },
+            { id: 16, nav: 'Rule 13 — اطلب تمديد', layout: 'rule', n: '13', icon: 'fa-clock-rotate-left', title: 'لو هتتأخر، اطلب تمديدًا رسميًا', points: ['بلّغ العميل بدري', 'وضّح سبب التأخير باختصار', 'حدّد موعدًا واقعيًا جديدًا', 'قدّم طلب تمديد من خلال المنصة لو متاح'], example: '', note: 'مجرد موافقة العميل في الشات مش بالضرورة تعدّل موعد التسليم الرسمي. التأخير غير المعتمد قد يؤثر على مؤشراتك.' },
+            { id: 17, nav: 'Rule 14 — وثّق الاتفاقات', layout: 'rule', n: '14', icon: 'fa-file-signature', title: 'وثّق الاتفاقات المهمة على المنصة', points: ['نطاق المشروع والسعر وأي إضافات', 'تعديلات موعد التسليم ومراحل التسليم', 'الموافقات المهمة'], example: '"للتأكيد، اتفقنا على إضافة قسم جديد مع تعديل موعد التسليم. برجاء تأكيد التفاصيل قبل البدء."', note: 'الهدف: يكون فيه سجل واضح للاتفاقات مع استخدام إجراءات التعديل الرسمية عند الحاجة.' },
+            { id: 18, nav: 'Rule 15 — تعديل أم إضافة؟', layout: 'rule', n: '15', icon: 'fa-scale-balanced', title: 'فرّق بين التعديل والإضافة الجديدة', points: ['تعديل بسيط: تغيير لون زر، تصحيح نص، تعديل مسافة', 'إضافة كبيرة: صفحة جديدة، تغيير التصميم بالكامل، وظيفة خارج الاتفاق', 'لو التعديل بسيط، ممكن تنفذه بمرونة', 'لو خارج النطاق، وضّح التكلفة والمدة الإضافية قبل التنفيذ'], example: '', note: 'المرونة مهمة، لكن لازم يكون فيه حدود واضحة لنطاق المشروع.' },
+            { id: 19, nav: 'المرحلة الثالثة: After', layout: 'phase', phase: 'المرحلة الثالثة', ar: 'بعد تسليم المشروع', en: 'After Delivery', icon: 'fa-trophy', color: 'amber' },
+            { id: 20, nav: 'Rule 16 — حافظ على العلاقة', layout: 'rule', n: '16', icon: 'fa-heart-handshake', title: 'حافظ على العلاقة مع العميل بعد التسليم', points: ['اتأكد إنك سلّمت كل المخرجات المتفق عليها', 'وضّح أي تعليمات استخدام داخلة ضمن الخدمة', 'تعامل باحترافية مع الملاحظات المشمولة', 'اشكر العميل وسيب الباب مفتوحًا للتعاون المستقبلي'], example: '"تم تسليم المشروع وفقًا للتفاصيل المتفق عليها. أتمنى تكون النتيجة مناسبة، ويسعدني التعاون مرة تانية."', note: 'حتى لو مش حابب تتعامل مرة تانية، أنهِ التعامل باحترام ومن غير وعود غير حقيقية.' },
+            { id: 21, nav: 'Checklist الشامل', layout: 'checklist' },
+            { id: 22, nav: 'الخلاصة — Thank You', layout: 'closing' }
+        ];
+
+        let currentSlideIndex = 0;
+
+        window.onload = function () { buildSidebarNav(); renderSlide(0); };
+
+        function kicker(text) {
+            if (!text) return '';
+            return '<span class="kicker text-xs font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2 mb-1"><span class="h-2 w-2 rounded-full bg-orange-500 animate-ping"></span>' + text + '</span>';
+        }
+        function noteBox(text) {
+            if (!text) return '';
+            return '<div class="mt-3 bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm md:text-base rounded-xl p-4 flex items-start gap-3 rtl-text"><i class="fa-solid fa-circle-info text-amber-400 mt-0.5 shrink-0"></i><span>' + text + '</span></div>';
+        }
+        function heading(text) {
+            if (!text) return '';
+            return '<h2 class="text-2xl md:text-4xl font-bold text-white border-r-4 border-orange-500 pr-4 mb-2 rtl-text">' + text + '</h2>';
+        }
+
+        function buildLayout(slide) {
+
+            if (slide.layout === 'cover') {
+                document.getElementById('corner-logos').style.display = 'none';
+                return `<div class="flex flex-col items-center justify-center text-center py-2 max-w-4xl mx-auto gap-4 relative">
+            <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex items-center justify-center gap-6 flex-wrap">
+                <div class="bg-white rounded-2xl px-5 py-3 shadow-xl"><img src="depi.jpeg" alt="DEPI" class="h-10 md:h-14 w-auto object-contain"></div>
+                <div class="bg-white rounded-2xl px-5 py-3 shadow-xl"><img src="freelance yard.jpeg" alt="Freelance Yard" class="h-10 md:h-14 w-auto object-contain"></div>
+            </div>
+            <div class="relative z-10 flex flex-col items-center gap-2">
+                <span class="text-xs font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-orange-500 animate-ping"></span>Freelancing Coaching Session</span>
+                <h1 class="text-3xl md:text-5xl font-bold text-white leading-tight">Client Communication<br><span class="text-orange-400">on Freelancing Platforms</span></h1>
+                <div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>
+                <p class="text-slate-300 text-base md:text-lg font-light leading-relaxed max-w-2xl" dir="rtl">من أول رسالة من العميل لحد تسليم المشروع</p>
+            </div>
+            <div class="relative z-10 mt-2 flex flex-col sm:flex-row items-stretch justify-center gap-5 w-full">
+                <div class="flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-gray-900/80 to-[#0b0f19] border border-gray-800/80 px-8 py-5 rounded-3xl">
+                    <div class="relative flex items-center justify-center">
+                        <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 blur-md opacity-60"></div>
+                        <img src="f573fe70-9005-440b-90e6-de67ae80356a.png" class="presenter-img relative h-32 w-24 md:h-40 md:w-28 rounded-[50%] object-cover border-4 border-[#0b0f19] shadow-lg" alt="Kerolos Emad Saad">
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] uppercase tracking-[0.25em] text-orange-400 font-bold">Presented By</p>
+                        <p class="text-lg md:text-xl font-bold text-white">Kerolos Emad Saad</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="nextSlide()" class="relative z-10 px-8 py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white rounded-xl text-sm font-bold uppercase tracking-wider transition duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-orange-600/20 flex items-center gap-3">
+                ابدأ العرض <i class="fa-solid fa-circle-play animate-pulse"></i>
+            </button>
+        </div>`;
+            }
+
+            if (slide.layout === 'journey') {
+                document.getElementById('corner-logos').style.display = 'flex';
+                return `<div class="flex flex-col gap-4 max-w-5xl mx-auto py-2 w-full">
+            ${kicker('رحلة المشروع في 3 مراحل')}
+            ${heading('رحلة المشروع')}
+            <div class="flex flex-col md:flex-row items-stretch gap-0 mt-3">
+                <div class="flex-1 bg-orange-500/10 border border-orange-500/30 rounded-2xl md:rounded-r-2xl md:rounded-l-none p-5 flex flex-col gap-2 text-right">
+                    <div class="flex items-center justify-end gap-2 mb-1"><i class="fa-solid fa-hourglass-start text-orange-400 text-lg"></i><span class="text-orange-400 font-bold text-sm uppercase tracking-wider">Before the Project</span></div>
+                    <h3 class="text-white font-bold text-lg">المرحلة الأولى: قبل المشروع</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">التواصل الأول، فهم المطلوب، الاتفاق على التفاصيل</p>
+                </div>
+                <div class="hidden md:flex items-center justify-center px-2 text-orange-500 text-2xl"><i class="fa-solid fa-arrow-left"></i></div>
+                <div class="flex-1 bg-blue-500/10 border border-blue-500/30 rounded-2xl md:rounded-none p-5 flex flex-col gap-2 text-right mt-3 md:mt-0">
+                    <div class="flex items-center justify-end gap-2 mb-1"><i class="fa-solid fa-gears text-blue-400 text-lg"></i><span class="text-blue-400 font-bold text-sm uppercase tracking-wider">During the Project</span></div>
+                    <h3 class="text-white font-bold text-lg">المرحلة الثانية: أثناء المشروع</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">التنفيذ، التواصل المستمر، إدارة التعديلات والتأخير</p>
+                </div>
+                <div class="hidden md:flex items-center justify-center px-2 text-orange-500 text-2xl"><i class="fa-solid fa-arrow-left"></i></div>
+                <div class="flex-1 bg-amber-500/10 border border-amber-500/30 rounded-2xl md:rounded-l-2xl md:rounded-r-none p-5 flex flex-col gap-2 text-right mt-3 md:mt-0">
+                    <div class="flex items-center justify-end gap-2 mb-1"><i class="fa-solid fa-trophy text-amber-400 text-lg"></i><span class="text-amber-400 font-bold text-sm uppercase tracking-wider">After Delivery</span></div>
+                    <h3 class="text-white font-bold text-lg">المرحلة الثالثة: بعد المشروع</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">التسليم، التعامل مع الملاحظات، الحفاظ على العلاقة مع العميل</p>
+                </div>
+            </div>
+            <div class="mt-2 bg-gray-900/60 border border-orange-500/20 rounded-xl p-4 text-right" dir="rtl">
+                <p class="text-slate-300 text-sm leading-relaxed"><span class="text-orange-400 font-bold">قبل المشروع</span> ← <span class="text-blue-400 font-bold">أثناء المشروع</span> ← <span class="text-amber-400 font-bold">بعد التسليم</span></p>
+            </div>
+        </div>`;
+            }
+
+            if (slide.layout === 'phase') {
+                document.getElementById('corner-logos').style.display = 'flex';
+                const colorMap = { orange: 'bg-orange-500/10 border-orange-500/30 text-orange-400', blue: 'bg-blue-500/10 border-blue-500/30 text-blue-400', amber: 'bg-amber-500/10 border-amber-500/30 text-amber-400' };
+                const c = colorMap[slide.color] || colorMap.orange;
+                return `<div class="flex flex-col items-center justify-center text-center gap-6 relative py-4 max-w-4xl mx-auto">
+            <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 w-24 h-24 rounded-full ${c.split(' ').slice(0, 2).join(' ')} border flex items-center justify-center text-4xl ${c.split(' ')[2]}">
+                <i class="fa-solid ${slide.icon}"></i>
+            </div>
+            <div class="relative z-10" dir="rtl">
+                <p class="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">${slide.phase}</p>
+                <h2 class="text-4xl md:text-6xl font-bold text-white leading-tight">${slide.ar}</h2>
+                <div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full mt-3 mx-auto"></div>
+                <p class="text-2xl md:text-3xl text-slate-400 mt-3 font-light">${slide.en}</p>
+            </div>
+        </div>`;
+            }
+
+            if (slide.layout === 'rule') {
+                document.getElementById('corner-logos').style.display = 'flex';
+                const pts = slide.points.map(p => `<li class="flex items-start gap-3 bg-gray-900/40 p-3 md:p-4 rounded-xl border border-gray-800 hover:border-orange-500/20 transition rtl-text"><i class="fa-solid fa-circle-check text-orange-500 mt-0.5 shrink-0"></i><span class="text-slate-300 text-sm md:text-base leading-relaxed">${p}</span></li>`).join('');
+                const ex = slide.example ? `<div class="bg-gray-900/60 border border-orange-500/20 rounded-xl p-4 rtl-text"><p class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2 flex-row-reverse"><i class="fa-solid fa-comment-dots"></i>مثال للرد</p><p class="text-slate-200 text-sm md:text-base leading-relaxed italic">"${slide.example}"</p></div>` : '';
+                return `<div class="flex flex-col gap-3 max-w-4xl mx-auto py-2 w-full">
+            <div class="flex items-center gap-4 flex-row-reverse">
+                <div class="rule-num h-12 w-12 md:h-14 md:w-14 shrink-0 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-xl md:text-2xl font-bold shadow-lg shadow-orange-600/30">${slide.n}</div>
+                <div class="text-right">
+                    ${kicker('Freelancing Coaching · Rule ' + slide.n + ' of 16')}
+                    <h2 class="text-xl md:text-3xl font-bold text-white leading-tight rtl-text"><i class="fa-solid ${slide.icon} text-orange-400 ml-2"></i>${slide.title}</h2>
+                </div>
+            </div>
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">${pts}</ul>
+            ${ex}
+            ${noteBox(slide.note)}
+        </div>`;
+            }
+
+            if (slide.layout === 'checklist') {
+                document.getElementById('corner-logos').style.display = 'flex';
+                const mkList = (items, color) => items.map(i => `<li class="flex items-start gap-2 rtl-text flex-row-reverse"><i class="fa-solid fa-square-check text-${color}-400 mt-0.5 shrink-0"></i><span class="text-slate-300 text-sm leading-relaxed">${i}</span></li>`).join('');
+                const before = ['رديت على العميل بسرعة', 'راجعت قواعد التواصل في المنصة', 'تأكدت إني أقدر أنفذ المشروع', 'وضّحت المخرجات والسعر والمدة', 'راجعت العرض قبل الموافقة', 'ما بدأتش الشغل الحقيقي قبل الاتفاق'];
+                const during = ['بعتّ تحديثات منتظمة', 'وثّقت التعديلات المهمة', 'طلبت تمديدًا رسميًا لو احتجت', 'راجعت نطاق التعديلات قبل تنفيذها'];
+                const after = ['راجعت كل المخرجات قبل التسليم', 'تعاملت باحترافية مع الملاحظات', 'حافظت على علاقة مهنية جيدة'];
+                return `<div class="flex flex-col gap-3 max-w-5xl mx-auto py-2 w-full">
+            ${kicker('Checklist الشامل')}
+            ${heading('قبل وأثناء وبعد المشروع')}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-1">
+                <div class="bg-orange-500/10 border border-orange-500/30 rounded-2xl p-4">
+                    <p class="text-orange-400 font-bold text-sm uppercase tracking-wider mb-3 text-right">قبل المشروع</p>
+                    <ul class="space-y-2">${mkList(before, 'orange')}</ul>
+                </div>
+                <div class="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
+                    <p class="text-blue-400 font-bold text-sm uppercase tracking-wider mb-3 text-right">أثناء المشروع</p>
+                    <ul class="space-y-2">${mkList(during, 'blue')}</ul>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+                    <p class="text-amber-400 font-bold text-sm uppercase tracking-wider mb-3 text-right">بعد المشروع</p>
+                    <ul class="space-y-2">${mkList(after, 'amber')}</ul>
+                </div>
+            </div>
+        </div>`;
+            }
+
+            if (slide.layout === 'closing') {
+                document.getElementById('corner-logos').style.display = 'none';
+                return `<div class="flex flex-col items-center justify-center text-center gap-4 relative py-2 max-w-4xl mx-auto">
+            <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+            <span class="relative z-10 text-xs font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-orange-500 animate-ping"></span>الخلاصة</span>
+            <h2 class="relative z-10 text-4xl md:text-6xl font-bold text-white leading-tight">الخلاصة</h2>
+            <div class="relative z-10 h-1.5 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>
+            <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 w-full mt-1" dir="rtl">
+                <div class="bg-orange-500/10 border border-orange-500/30 rounded-2xl p-5 text-right"><div class="text-orange-400 font-bold mb-2"><i class="fa-solid fa-hourglass-start ml-2"></i>قبل المشروع</div><p class="text-slate-300 text-sm leading-relaxed">افهم المطلوب واتفق على كل التفاصيل.</p></div>
+                <div class="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 text-right"><div class="text-blue-400 font-bold mb-2"><i class="fa-solid fa-gears ml-2"></i>أثناء المشروع</div><p class="text-slate-300 text-sm leading-relaxed">تواصل بوضوح، والتزم بالاتفاق، ووثّق التغييرات.</p></div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 text-right"><div class="text-amber-400 font-bold mb-2"><i class="fa-solid fa-trophy ml-2"></i>بعد المشروع</div><p class="text-slate-300 text-sm leading-relaxed">سلّم باحترافية وحافظ على سمعتك وعلاقتك بالعميل.</p></div>
+            </div>
+            <div class="relative z-10 bg-gray-900/60 border border-orange-500/20 rounded-2xl p-5 w-full" dir="rtl">
+                <p class="text-slate-200 text-base md:text-lg leading-relaxed italic">"مش المطلوب منك تكسب كل عميل، المطلوب إنك تعرف تدير كل محادثة باحترافية، وتحمي حسابك وحقوقك، وتسلّم شغل تقدر تكون فخور بيه."</p>
+            </div>
+            <h3 class="relative z-10 text-4xl md:text-5xl font-bold text-white mt-1">Thank You! 🎉</h3>
+        </div>`;
+            }
+            return '';
+        }
+
+        function renderSlide(index) {
+            currentSlideIndex = index;
+            const slide = slides[index];
+            document.querySelectorAll('.nav-item').forEach((item, idx) => {
+                if (idx === index) { item.classList.add('bg-orange-600', 'text-white'); item.classList.remove('text-slate-400', 'hover:bg-gray-800/60'); }
+                else { item.classList.remove('bg-orange-600', 'text-white'); item.classList.add('text-slate-400', 'hover:bg-gray-800/60'); }
+            });
+            document.getElementById('slide-count-indicator').innerText = (index + 1) + '/' + slides.length;
+            document.getElementById('slide-progress-bar').style.width = ((index / (slides.length - 1)) * 100) + '%';
+            const viewport = document.getElementById('slide-body');
+            viewport.innerHTML = '<div class="w-full my-auto">' + buildLayout(slide) + '</div>';
+            setTimeout(() => { viewport.classList.remove('slide-fade-enter'); }, 50);
+        }
+
+        function buildSidebarNav() {
+            const nav = document.getElementById('slide-list-nav');
+            nav.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const item = document.createElement('button');
+                item.className = 'nav-item w-full text-right px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition flex items-center gap-3 flex-row-reverse active:scale-[0.98] text-slate-400 hover:bg-gray-800/60';
+                item.innerHTML = '<span class="h-5 w-5 rounded-full bg-gray-800 text-slate-300 flex items-center justify-center font-mono text-[10px] border border-gray-700 font-bold shrink-0">' + (index + 1) + '</span><span class="truncate text-right">' + slide.nav + '</span>';
+                item.onclick = function () { renderSlide(index); };
+                nav.appendChild(item);
+            });
+        }
+
+        function nextSlide() { if (currentSlideIndex < slides.length - 1) renderSlide(currentSlideIndex + 1); else renderSlide(0); }
+        function prevSlide() { if (currentSlideIndex > 0) renderSlide(currentSlideIndex - 1); else renderSlide(slides.length - 1); }
+        function toggleFullscreen() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement) { elem.requestFullscreen().then(() => document.body.classList.add('fullscreen-mode')).catch(err => console.error(err)); }
+            else { document.exitFullscreen(); document.body.classList.remove('fullscreen-mode'); }
+        }
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) document.body.classList.add('fullscreen-mode');
+            else document.body.classList.remove('fullscreen-mode');
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+        });
+    </script>
+</body>
+
+</html>

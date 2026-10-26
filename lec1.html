@@ -1,0 +1,816 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelancing Coaching</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+
+        .slide-fade-enter { opacity: 0; transform: translateY(10px); transition: all 0.3s ease-out; }
+        .slide-fade-active { opacity: 1; transform: translateY(0); }
+
+        body.fullscreen-mode { overflow: hidden; }
+        body.fullscreen-mode main {
+            grid-template-columns: 1fr !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100vw !important;
+            width: 100vw !important;
+            height: 100vh !important;
+        }
+        body.fullscreen-mode aside { display: none !important; }
+        body.fullscreen-mode section {
+            grid-column: span 4 / span 4 !important;
+            height: 100vh !important;
+            gap: 0 !important;
+        }
+        body.fullscreen-mode #slide-viewport {
+            border: none !important;
+            border-radius: 0 !important;
+            height: 100vh !important;
+            min-height: 100vh !important;
+            width: 100vw !important;
+            padding: 2.5rem 3.5rem 1.5rem !important;
+        }
+        body.fullscreen-mode #controls-toolbar { display: none !important; }
+
+        /* Content scrolls inside the slide instead of overflowing */
+        body.fullscreen-mode #slide-body { overflow-y: auto !important; justify-content: flex-start !important; }
+        body.fullscreen-mode #slide-body > div { margin-top: auto; margin-bottom: auto; }
+
+        /* Gentler fullscreen scaling so everything fits on screen */
+        body.fullscreen-mode h2 { font-size: 3rem !important; line-height: 1.15 !important; }
+        body.fullscreen-mode h3 { font-size: 1.7rem !important; line-height: 1.3 !important; }
+        body.fullscreen-mode p,
+        body.fullscreen-mode li,
+        body.fullscreen-mode blockquote,
+        body.fullscreen-mode span:not(.font-mono) { font-size: 1.25rem !important; line-height: 1.9rem !important; }
+        body.fullscreen-mode .kicker { font-size: 0.9rem !important; }
+        body.fullscreen-mode img:not(.profile-img):not(.brand-logo):not(.presenter-img) { max-height: 50vh !important; }
+        body.fullscreen-mode .brand-logo { max-height: 5rem !important; width: auto !important; }
+        body.fullscreen-mode .presenter-img { height: 13rem !important; width: 8.5rem !important; }
+        body.fullscreen-mode .tip-number { height: 3.5rem !important; width: 3.5rem !important; font-size: 1.6rem !important; }
+        body.fullscreen-mode .step-number { height: 3.5rem !important; width: 3.5rem !important; font-size: 1.6rem !important; }
+        body.fullscreen-mode .slide-footer { font-size: 1rem !important; margin-top: 0.75rem !important; }
+    </style>
+</head>
+<body class="bg-[#030712] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white overflow-x-hidden font-sans">
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <aside class="order-2 lg:order-1 lg:col-span-1 bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-col justify-between max-h-64 lg:max-h-[calc(100vh-140px)] overflow-y-auto">
+            <div>
+                <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 px-2 flex justify-between items-center">
+                    <span>Slide Navigation</span>
+                    <span id="slide-count-indicator" class="text-orange-500 font-mono">1/29</span>
+                </h2>
+                <nav id="slide-list-nav" class="space-y-1"></nav>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-800 text-center">
+                <p class="text-[11px] text-slate-500">Press Left / Right / Space on keyboard</p>
+            </div>
+        </aside>
+
+        <section class="order-1 lg:order-2 lg:col-span-3 flex flex-col gap-6">
+            <div id="slide-viewport" class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-5 sm:p-6 md:p-10 min-h-[420px] md:min-h-[500px] flex flex-col justify-between relative shadow-2xl overflow-hidden">
+                <div id="slide-progress-bar" class="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 transition-all duration-300 z-30" style="width: 0%"></div>
+
+                <div id="corner-logos" class="absolute top-3 right-3 md:top-4 md:right-4 z-20 bg-white/95 backdrop-blur-md px-2.5 py-1 md:px-3 md:py-1.5 rounded-xl border border-gray-800 flex items-center justify-center gap-2 md:gap-3">
+                    <img src="depi.jpeg" class="brand-logo h-6 md:h-8 w-auto object-contain" alt="DEPI">
+                    <span class="h-6 w-px bg-gray-300"></span>
+                    <img src="freelance%20yard.jpeg" class="brand-logo h-6 md:h-8 w-auto object-contain" alt="Freelance Yard">
+                </div>
+
+                <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-orange-500/5 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-45 -left-45 w-80 h-80 rounded-full bg-blue-500/5 blur-3xl pointer-events-none"></div>
+
+                <div id="slide-body" class="relative z-10 flex-grow flex flex-col justify-center slide-fade-enter slide-fade-active"></div>
+
+                <div class="slide-footer mt-4 pt-2 border-t border-gray-800/40 flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center text-center sm:text-left text-[10px] sm:text-xs text-slate-500 relative z-10">
+                    <span class="font-light">Freelancing Coaching</span>
+                    <a href="https://freelancing-coaching.vercel.app/" target="_blank" class="font-mono text-orange-400 hover:text-orange-300 transition break-all">freelancing-coaching.vercel.app</a>
+                </div>
+            </div>
+
+            <div id="controls-toolbar" class="bg-[#0b0f19] border border-gray-800 rounded-2xl p-4 flex flex-row items-center justify-between shadow-xl">
+                <div class="flex items-center gap-2 w-full justify-between sm:justify-start flex-wrap">
+                    <button onclick="prevSlide()" class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left text-orange-500"></i> Prev
+                    </button>
+                    <button onclick="nextSlide()" class="flex-1 sm:flex-none justify-center px-5 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 shadow-lg shadow-orange-600/15">
+                        Next <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button onclick="toggleFullscreen()" class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-slate-200 border border-gray-800 rounded-xl text-xs font-bold uppercase tracking-wider transition active:scale-95 flex items-center gap-2 sm:ml-auto">
+                        <i class="fa-solid fa-expand text-orange-500"></i> Fullscreen
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const QR_URL = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://freelancing-coaching.vercel.app/";
+
+        const slidesData = [
+            {
+                id: 1,
+                title: "Welcome",
+                layout: "title",
+                heading: "Freelancing Coaching",
+                tagline: "From learning to earning” turn your skills into real, paid projects.",
+                presenter: "Kerolos Emad Saad",
+                qr: QR_URL,
+                image: "f573fe70-9005-440b-90e6-de67ae80356a.png",
+                logos: [
+                    { src: "depi.jpeg", alt: "DEPI" },
+                    { src: "freelance%20yard.jpeg", alt: "Freelance Yard" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Today's Goals",
+                slideTitle: "What We Need to Achieve Today",
+                layout: "card-grid",
+                columns: 2,
+                kicker: "Four clear goals",
+                cards: [
+                    { num: "01", title: "Understand the target", text: "Know what success looks like in this coaching." },
+                    { num: "02", title: "Check where you are now", text: "Find your strengths and your biggest gaps." },
+                    { num: "03", title: "Practice for real", text: "Look at a profile, pick a job, and write a real proposal." },
+                    { num: "04", title: "Leave with a plan", text: "Choose clear steps to finish before Session 2." }
+                ]
+            },
+            {
+                id: 3,
+                title: "The Coaching Target",
+                slideTitle: "The Coaching Target",
+                layout: "target",
+                kicker: "The Mission",
+                lead: "We are not here only to learn more. We are here to enter the market and make progress we can measure.",
+                targetA: { label: "Success Target", text: "3 paid projects, each at least $3." },
+                targetB: { label: "Alternative Target", text: "1 bigger project, around $200 or more." },
+                note: "The work must be real and provable. Not orders from friends or family, and not informal chats on social media."
+            },
+            {
+                id: 4,
+                title: "How We Work",
+                slideTitle: "How We Will Work Together",
+                layout: "list",
+                kicker: "Our rules",
+                bullets: [
+                    "Doing the work matters more than just attending.",
+                    "Be honest about your level” this is a check-up, not a judgment.",
+                    "Ask for feedback early, then use it.",
+                    "Apply only to good-fit jobs, not random ones.",
+                    "Track your actions, replies, lessons, and next steps.",
+                    "Never exaggerate your skills, samples, or results."
+                ]
+            },
+            {
+                id: 5,
+                title: "Student Diagnostic",
+                slideTitle: "Quick Student Diagnostic",
+                layout: "list",
+                kicker: "Where are you now?",
+                numbered: true,
+                columns: 2,
+                bullets: [
+                    "What skill can you offer?",
+                    "Which freelance platforms do you use?",
+                    "Do you have a profile, portfolio, and CV ready?",
+                    "Have you sent proposals before? How many?",
+                    "Have you finished a paid project before?",
+                    "If not, what is stopping you?"
+                ],
+                note: "\"Zero\" or \"I don't know\" is a useful answer. It shows us exactly what to fix."
+            },
+            {
+                id: 6,
+                title: "Six Dimensions",
+                slideTitle: "Freelancing Readiness: Six Dimensions",
+                layout: "card-grid",
+                columns: 3,
+                kicker: "Readiness check",
+                cards: [
+                    { icon: "fa-solid fa-screwdriver-wrench text-orange-500", title: "Technical", text: "Can you really deliver the service now?" },
+                    { icon: "fa-solid fa-bullseye text-amber-400", title: "Service clarity", text: "Do you know what you sell, and to whom?" },
+                    { icon: "fa-solid fa-images text-blue-400", title: "Portfolio", text: "Can you prove it with samples?" },
+                    { icon: "fa-solid fa-id-badge text-emerald-400", title: "Platform profile", text: "Is it complete and professional?" },
+                    { icon: "fa-solid fa-pen-to-square text-rose-400", title: "Proposals", text: "Can you read a job and write a good reply?" },
+                    { icon: "fa-solid fa-magnifying-glass-dollar text-indigo-400", title: "Market", text: "Can you find jobs, judge fit, price, and talk to clients?" }
+                ]
+            },
+            {
+                id: 7,
+                title: "Profile & Portfolio Audit",
+                slideTitle: "Profile & Portfolio Audit",
+                layout: "audit",
+                left: {
+                    title: "Profile",
+                    icon: "fa-solid fa-user-tie text-orange-500",
+                    items: [
+                        "Clear, professional title",
+                        "Service is clear at first look",
+                        "About section talks about client value",
+                        "Complete profile with a clear next step"
+                    ]
+                },
+                right: {
+                    title: "Portfolio",
+                    icon: "fa-solid fa-folder-open text-emerald-400",
+                    items: [
+                        "Samples match the service",
+                        "Enough proof to build trust",
+                        "Prices are clear and explainable",
+                        "No exaggerated or fake claims"
+                    ]
+                }
+            },
+            {
+                id: 8,
+                title: "Tip 1 - Apply Early",
+                type: "tip", n: "1", repeat: true,
+                tipTitle: "Apply Early",
+                do: "Send your proposal as soon as the job is posted. Try to be one of the first people who apply.",
+                dont: "Don't say: \"I will do it later when I have free time.\" Later usually means the job is already taken.",
+                why: "Most clients read the first few proposals. Sometimes they hire within the first hour."
+            },
+            {
+                id: 9,
+                title: "Tip 2 - Apply Early Again",
+                type: "tip", n: "2", repeat: true,
+                tipTitle: "Apply Early — Again",
+                do: "Check new jobs many times a day, not once. Open the newest list and refresh it regularly.",
+                dont: "Don't rely only on notifications. By the time you see them, others have already applied.",
+                why: "Good jobs can get 20 to 50 proposals very quickly."
+            },
+            {
+                id: 10,
+                title: "Tip 3 - Apply Early Once More",
+                type: "tip", n: "3", repeat: true,
+                tipTitle: "Apply Early — One More Time",
+                do: "Build a simple routine: check new jobs every 30 to 60 minutes during your working hours.",
+                dont: "Don't spend an hour perfecting one proposal for a job that is already closed.",
+                why: "I repeated this three times on purpose. Speed is the easiest advantage you can control."
+            },
+            {
+                id: 11,
+                title: "Tip 4 - Write for the Client",
+                type: "tip", n: "4",
+                tipTitle: "Write for the Client, Not for Yourself",
+                do: "Talk about the client's problem and the result they want. Show that you understand their project.",
+                dont: "Don't write: \"I love design since I was a child and I am a hardworking person.\" The client does not care about your story.",
+                why: "Clients buy solutions, not biographies."
+            },
+            {
+                id: 12,
+                title: "Tip 5 - No Copy-Paste",
+                type: "tip", n: "5",
+                tipTitle: "No Copy-Paste Proposals",
+                do: "Mention the client's project name and one or two details from the job post.",
+                dont: "Don't send the exact same message to 50 jobs. Clients can feel it, and they ignore it.",
+                why: "A generic proposal looks like spam."
+            },
+            {
+                id: 13,
+                title: "Tip 6 - Start Low, Raise Later",
+                type: "tip", n: "6",
+                tipTitle: "No Rating? Start Low, Raise Later",
+                do: "With zero reviews, bid a low price to win your first jobs. Collect good reviews, then increase your price.",
+                dont: "Don't start with a high price when you have no proof. Rated freelancers will win instead.",
+                why: "Your first reviews are worth more than your first price."
+            },
+            {
+                id: 14,
+                title: "Tip 7 - Reserve Then Improve",
+                type: "tip", n: "7",
+                tipTitle: "Reserve Your Spot, Then Improve",
+                do: "Send a short but valid proposal quickly to be early. You can edit and improve it before the client reads it.",
+                dont: "Don't leave it empty or write a broken half sentence.",
+                why: "This lets you be early and professional at the same time."
+            },
+            {
+                id: 15,
+                title: "Tip 8 - Attach Your Work",
+                type: "tip", n: "8",
+                tipTitle: "Attach Your Real Work",
+                do: "If you do websites or design, attach a live link or clear screenshots of your work.",
+                dont: "Don't only describe your skills in words. Words are easy; proof is stronger.",
+                why: "A real example can win the job for you."
+            },
+            {
+                id: 16,
+                title: "Tip 9 - Hook Them First",
+                type: "tip", n: "9",
+                tipTitle: "Hook Them in the First Line",
+                do: "Start with the client's goal or a result you delivered. Make your first sentence interesting.",
+                dont: "Don't start with: \"Hello sir, I hope you are fine.\" It is boring and everyone writes it.",
+                why: "The first line decides if they read the rest."
+            },
+            {
+                id: 17,
+                title: "Tip 10 - Show Similar Work",
+                type: "tip", n: "10",
+                tipTitle: "Show Similar Work",
+                do: "If you finished a project like the one posted, say it clearly and attach it as proof.",
+                dont: "Don't hide your relevant experience. If you did similar work, the client must know.",
+                why: "Similar experience is your strongest proof."
+            },
+            {
+                id: 18,
+                title: "Tip 11 - Check Hiring Rate",
+                type: "tip", n: "11",
+                tipTitle: "Check the Client's Hiring Rate",
+                do: "Look at how many jobs the client posted and how many they actually hired. A good rate means apply.",
+                dont: "Don't waste proposals on clients who never hire. Many accounts are fake or just testing.",
+                why: "Your proposal has value. Spend it on real clients."
+            },
+            {
+                id: 19,
+                title: "Tip 12 - Best Time",
+                type: "tip", n: "12",
+                tipTitle: "Best Time to Apply",
+                do: "Apply from about 9:30 to 10:00 in the morning, and stay active during the day.",
+                dont: "Don't apply only at night, when hundreds of others already applied before you.",
+                why: "Morning is prime time, because many new jobs appear then."
+            },
+            {
+                id: 25,
+                title: "A Strong Proposal-” 5 Parts",
+                slideTitle: "A Strong Proposal Has 5 Parts",
+                layout: "parts",
+                kicker: "Proposal structure",
+                parts: [
+                    { n: "01", title: "Greeting", text: "Address the client naturally." },
+                    { n: "02", title: "Understanding", text: "Show you understand the actual need." },
+                    { n: "03", title: "Execution plan", text: "Explain how you will approach the task." },
+                    { n: "04", title: "Relevant proof", text: "Share a matching sample or relevant experience." },
+                    { n: "05", title: "Next step", text: "Ask a useful question or suggest a short discussion." }
+                ]
+            },
+            {
+                id: 26,
+                title: "Your Service in One Sentence",
+                slideTitle: "Can You Explain Your Service in One Sentence?",
+                layout: "sentence",
+                kicker: "Positioning",
+                formula: "I help [who] get [result] using [skill].",
+                example: "I help small businesses clean their sales data and build simple Excel reports.",
+                turn: "YOUR TURN: write your own one sentence. If it is not clear, fix it before applying to more jobs."
+            },
+            {
+                id: 27,
+                title: "Step 1 - A Clear Title",
+                type: "step", n: "1",
+                stepTitle: "Make Your Title Grab Attention",
+                lead: "Your title is the first thing the client sees. It should answer one question fast: what will you do for me?",
+                points: [
+                    "Say clearly what you will do, and for whom.",
+                    "Add one benefit: speed or quality."
+                ]
+            },
+            {
+                id: 28,
+                title: "Step 2 - Clear Steps",
+                type: "step", n: "2",
+                stepTitle: "Break Your Service Into Simple Steps",
+                lead: "Clients want to know what they are paying for. Show them each step, from start to delivery.",
+                points: [
+                    "Use a simple numbered list.",
+                    "Keep every step short and clear.",
+                    "Cover the full journey to final delivery."
+                ]
+            },
+            {
+                id: 29,
+                title: "Step 3 - Price & Time",
+                type: "step", n: "3",
+                stepTitle: "State the Price and Time Clearly",
+                lead: "A clear price and delivery time remove doubt and let the client order with confidence.",
+                points: [
+                    "Show the price with no hidden costs.",
+                    "Say exactly when you will deliver.",
+                    "If it varies, give a clear range."
+                ]
+            },
+            {
+                id: 30,
+                title: "Step 4 - Ask Up Front",
+                type: "step", n: "4",
+                stepTitle: "Ask for What You Need Up Front",
+                lead: "Ask your questions before the project starts, not in the middle, to save time.",
+                points: [
+                    "List the files or links you need.",
+                    "Give the client a simple checklist.",
+                    "Get everything at once."
+                ]
+            },
+            {
+                id: 31,
+                title: "Step 5 - Professional Visual",
+                type: "step", n: "5",
+                stepTitle: "Add a Professional Thumbnail or Video",
+                lead: "Good looks attract attention. A clean cover image or a short video makes your service stand out.",
+                points: [
+                    "Use a clean, organized cover image.",
+                    "Or add a short video of your work.",
+                    "Keep it tidy and professional."
+                ]
+            },
+            {
+                id: 32,
+                title: "Readiness Classification",
+                slideTitle: "Readiness Classification",
+                layout: "classify",
+                kicker: "Where do you stand?",
+                levels: [
+                    { color: "green", label: "GREEN", subtitle: "Ready to execute", text: "Core service is clear; profile and samples are usable.", next: "Next: apply to suitable jobs and track results." },
+                    { color: "yellow", label: "YELLOW", subtitle: "Specific fixes needed", text: "A few gaps are limiting credibility or conversion.", next: "Next: fix the gaps, then apply selectively." },
+                    { color: "red", label: "RED", subtitle: "Foundations needed", text: "Service, profile, or portfolio is not ready yet.", next: "Next: build the basics before mass-applying." }
+                ]
+            },
+            {
+                id: 33,
+                title: "Your Action Plan",
+                slideTitle: "Your Action Plan Before Session 2",
+                layout: "action",
+                kicker: "Do this before Session 2",
+                levels: [
+                    { color: "green", label: "GREEN", items: ["Send at least 5 suitable proposals", "Publish or improve one Gig/service", "Track replies and interview invitations"] },
+                    { color: "yellow", label: "YELLOW", items: ["Fix the agreed portfolio/profile gaps", "Apply the feedback", "Send 3 proposals after improvements"] },
+                    { color: "red", label: "RED", items: ["Define one clear service", "Complete the profile", "Create or improve one portfolio item", "Review changes with the coach"] }
+                ]
+            },
+            {
+                id: 34,
+                title: "Thank You",
+                layout: "thankyou",
+                heading: "Thank You!",
+                message: "Now it is your turn. Start with one small step today.",
+                presenter: "Kerolos Emad Saad",
+                qr: QR_URL
+            }
+        ];
+
+        let currentSlideIndex = 0;
+
+        window.onload = function () {
+            buildSidebarNav();
+            renderSlide(0);
+        };
+
+        function renderSlide(index) {
+            currentSlideIndex = index;
+            const slide = slidesData[index];
+
+            document.querySelectorAll('.nav-item').forEach((item, idx) => {
+                if (idx === index) {
+                    item.classList.add('bg-orange-600', 'text-white');
+                    item.classList.remove('text-slate-400', 'hover:bg-gray-800/60');
+                } else {
+                    item.classList.remove('bg-orange-600', 'text-white');
+                    item.classList.add('text-slate-400', 'hover:bg-gray-800/60');
+                }
+            });
+
+            document.getElementById('slide-count-indicator').innerText = (index + 1) + '/' + slidesData.length;
+            document.getElementById('slide-progress-bar').style.width = ((index / (slidesData.length - 1)) * 100) + '%';
+
+            document.getElementById('corner-logos').style.display = (slide.layout === 'title') ? 'none' : 'flex';
+
+            const viewport = document.getElementById('slide-body');
+            viewport.innerHTML = '<div class="w-full my-auto">' + buildLayout(slide) + '</div>';
+
+            setTimeout(() => { viewport.classList.remove('slide-fade-enter'); }, 50);
+        }
+
+        function kicker(text) {
+            if (!text) return '';
+            return '<span class="kicker text-xs font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2 mb-1">' +
+                '<span class="h-2 w-2 rounded-full bg-orange-500 animate-ping"></span> ' + text + '</span>';
+        }
+
+        function noteBox(text) {
+            if (!text) return '';
+            return '<div class="mt-4 bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm md:text-base rounded-xl p-4 flex items-start gap-3">' +
+                '<i class="fa-solid fa-circle-info text-amber-400 mt-0.5"></i><span>' + text + '</span></div>';
+        }
+
+        function heading(text) {
+            if (!text) return '';
+            return '<h2 class="text-2xl md:text-4xl font-serif font-bold text-white border-l-4 border-orange-500 pl-4 mb-2">' + text + '</h2>';
+        }
+
+        function buildLayout(slide) {
+            if (slide.layout === 'title') {
+                const logos = slide.logos.map(l =>
+                    '<div class="bg-white rounded-2xl px-5 py-3 shadow-xl flex items-center justify-center">' +
+                    '<img src="' + l.src + '" alt="' + l.alt + '" class="brand-logo h-12 md:h-16 w-auto object-contain"></div>'
+                ).join('');
+
+                return '' +
+                    '<div class="flex flex-col items-center justify-center text-center py-2 max-w-4xl mx-auto gap-5 relative">' +
+                        '<div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none"></div>' +
+                        '<div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>' +
+                        '<div class="relative z-10 flex items-center justify-center gap-6 md:gap-10 flex-wrap">' + logos + '</div>' +
+                        '<div class="relative z-10 flex flex-col items-center gap-3">' +
+                            '<span class="kicker text-xs font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2">' +
+                                '<span class="h-2 w-2 rounded-full bg-orange-500 animate-ping"></span> WELCOME</span>' +
+                            '<h2 class="text-4xl md:text-6xl font-serif font-bold text-white leading-tight">' + slide.heading + '</h2>' +
+                            '<div class="h-1 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>' +
+                            '<p class="text-slate-300 text-base md:text-xl font-light leading-relaxed max-w-2xl">' + slide.tagline + '</p>' +
+                        '</div>' +
+                        '<div class="relative z-10 mt-6 flex flex-col sm:flex-row items-stretch justify-between gap-6 sm:gap-12 w-full">' +
+                            '<div class="flex-1 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-gray-900/80 to-[#0b0f19] border border-gray-800/80 px-8 py-6 rounded-3xl">' +
+                                '<div class="relative flex items-center justify-center">' +
+                                    '<div class="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 blur-md opacity-60"></div>' +
+                                    '<img src="' + slide.image + '" class="presenter-img relative h-40 w-28 md:h-48 md:w-32 rounded-[50%] object-cover border-4 border-[#0b0f19] shadow-lg" alt="' + slide.presenter + '">' +
+                                '</div>' +
+                                '<div class="text-center">' +
+                                    '<p class="text-[10px] uppercase tracking-[0.25em] text-orange-400 font-bold">Presented By</p>' +
+                                    '<p class="text-lg md:text-xl font-bold text-white">' + slide.presenter + '</p>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="flex flex-col items-center justify-center gap-3 bg-white px-6 py-6 rounded-3xl shadow-xl">' +
+                                '<img src="' + slide.qr + '" class="qr-img h-28 w-28 md:h-36 md:w-36 rounded-xl" alt="QR code">' +
+                                '<p class="text-[10px] uppercase tracking-[0.2em] text-gray-700 font-bold text-center max-w-[9rem]">Scan to open the slides</p>' +
+                            '</div>' +
+                        '</div>' +
+                        '<button onclick="nextSlide()" class="relative z-10 mt-1 px-8 py-3.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white rounded-xl text-sm font-bold uppercase tracking-wider transition duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-orange-600/20 flex items-center gap-3">' +
+                            'Start Presentation <i class="fa-solid fa-circle-play animate-pulse"></i>' +
+                        '</button>' +
+                    '</div>';
+            }
+
+            if (slide.layout === 'card-grid') {
+                const cols = slide.columns === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2';
+                const cards = slide.cards.map(c =>
+                    '<div class="bg-gray-900/60 border border-gray-800 p-5 md:p-6 rounded-2xl shadow-lg flex flex-col hover:border-orange-500/30 transition duration-300">' +
+                        (c.num
+                            ? '<div class="text-2xl font-serif font-bold text-orange-500 mb-2">' + c.num + '</div>'
+                            : '<div class="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg mb-3"><i class="' + c.icon + '"></i></div>') +
+                        '<h3 class="text-lg md:text-xl font-bold text-white mb-2">' + c.title + '</h3>' +
+                        '<p class="text-slate-300 text-sm md:text-base leading-relaxed">' + c.text + '</p>' +
+                    '</div>'
+                ).join('');
+                return '<div class="flex flex-col gap-4 max-w-5xl mx-auto py-2 w-full">' +
+                    kicker(slide.kicker) + heading(slide.slideTitle) +
+                    '<div class="grid ' + cols + ' gap-5 mt-2">' + cards + '</div></div>';
+            }
+
+            if (slide.layout === 'target') {
+                return '<div class="flex flex-col gap-5 max-w-4xl mx-auto py-2 w-full">' +
+                    kicker(slide.kicker) + heading(slide.slideTitle) +
+                    '<p class="text-xl md:text-2xl font-serif text-slate-200 leading-relaxed mt-1">' + slide.lead + '</p>' +
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">' +
+                        '<div class="bg-emerald-950/20 border border-emerald-500/25 p-6 rounded-2xl">' +
+                            '<span class="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-300 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider mb-3"><i class="fa-solid fa-check-circle"></i> ' + slide.targetA.label + '</span>' +
+                            '<p class="text-slate-200 text-lg md:text-xl leading-relaxed">' + slide.targetA.text + '</p>' +
+                        '</div>' +
+                        '<div class="bg-blue-950/20 border border-blue-500/25 p-6 rounded-2xl">' +
+                            '<span class="inline-flex items-center gap-2 bg-blue-500/10 text-blue-300 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider mb-3"><i class="fa-solid fa-star"></i> ' + slide.targetB.label + '</span>' +
+                            '<p class="text-slate-200 text-lg md:text-xl leading-relaxed">' + slide.targetB.text + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    noteBox(slide.note) + '</div>';
+            }
+
+            if (slide.layout === 'list') {
+                const twoCol = slide.columns === 2 ? 'md:grid-cols-2' : '';
+                const items = slide.bullets.map((b, i) =>
+                    '<li class="flex items-start gap-3 bg-gray-900/40 p-4 rounded-xl border border-gray-800 hover:border-orange-500/20 transition">' +
+                        (slide.numbered
+                            ? '<span class="h-6 w-6 shrink-0 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center text-xs font-bold mt-0.5">' + (i + 1) + '</span>'
+                            : '<span class="text-orange-500 text-lg mt-0.5"><i class="fa-solid fa-circle-arrow-right"></i></span>') +
+                        '<span class="text-slate-300 text-base md:text-lg leading-relaxed">' + b + '</span>' +
+                    '</li>'
+                ).join('');
+                return '<div class="flex flex-col gap-4 max-w-5xl mx-auto py-2 w-full">' +
+                    kicker(slide.kicker) + heading(slide.slideTitle) +
+                    '<ul class="grid grid-cols-1 ' + twoCol + ' gap-3 mt-2">' + items + '</ul>' +
+                    noteBox(slide.note) + '</div>';
+            }
+
+            if (slide.layout === 'audit') {
+                const panel = (d) =>
+                    '<div class="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 md:p-8 hover:border-orange-500/30 transition">' +
+                        '<h3 class="text-xl md:text-2xl font-serif font-bold text-white mb-4 flex items-center gap-3"><i class="' + d.icon + '"></i> ' + d.title + '</h3>' +
+                        '<ul class="space-y-3">' +
+                            d.items.map(it => '<li class="flex items-start gap-3"><i class="fa-solid fa-circle-check text-orange-500 text-sm mt-1.5"></i><span class="text-slate-300 text-base md:text-lg leading-relaxed">' + it + '</span></li>').join('') +
+                        '</ul>' +
+                    '</div>';
+                return '<div class="flex flex-col gap-4 max-w-5xl mx-auto py-2 w-full">' +
+                    heading(slide.slideTitle) +
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">' + panel(slide.left) + panel(slide.right) + '</div></div>';
+            }
+
+            if (slide.type === 'tip') {
+                return '<div class="flex flex-col gap-5 max-w-4xl mx-auto py-2 w-full">' +
+                    '<div class="flex items-center gap-4">' +
+                        '<div class="tip-number h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shadow-orange-600/30">' + slide.n + '</div>' +
+                        '<div>' +
+                            kicker(slide.repeat ? 'Mostaql Tips· Tip ' + slide.n + ' of 12 · Repeated on purpose' : 'Mostaql Tips · Tip ' + slide.n + ' of 12') +
+                            '<h2 class="text-2xl md:text-4xl font-serif font-bold text-white leading-tight">' + slide.tipTitle + '</h2>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-5">' +
+                        '<div class="bg-gray-900/60 border border-emerald-500/20 rounded-2xl p-6">' +
+                            '<p class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> What to do</p>' +
+                            '<p class="text-slate-200 text-base md:text-lg leading-relaxed">' + slide.do + '</p>' +
+                        '</div>' +
+                        '<div class="bg-rose-950/20 border border-rose-500/25 rounded-2xl p-6">' +
+                            '<p class="text-xs font-bold text-rose-400 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-xmark"></i> Don\'t do this</p>' +
+                            '<p class="text-slate-200 text-base md:text-lg leading-relaxed">' + slide.dont + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="bg-amber-500/10 border border-amber-500/30 text-amber-100 rounded-xl p-4 flex items-start gap-3">' +
+                        '<i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>' +
+                        '<span class="text-base md:text-lg leading-relaxed"><span class="font-bold">Why it matters: </span>' + slide.why + '</span>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            if (slide.type === 'step') {
+                const points = slide.points.map(p =>
+                    '<li class="flex items-start gap-3 bg-gray-900/60 border border-gray-800 rounded-xl p-4">' +
+                        '<i class="fa-solid fa-circle-check text-orange-500 mt-1 shrink-0"></i>' +
+                        '<span class="text-slate-200 text-base md:text-lg leading-relaxed">' + p + '</span>' +
+                    '</li>'
+                ).join('');
+                return '<div class="flex flex-col gap-5 max-w-4xl mx-auto py-2 w-full">' +
+                    '<div class="flex items-center gap-4">' +
+                        '<div class="step-number h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shadow-orange-600/30">' + slide.n + '</div>' +
+                        '<div>' +
+                            kicker('Building a Winning Service· Step ' + slide.n + ' of 5') +
+                            '<h2 class="text-xl md:text-3xl font-serif font-bold text-white leading-tight">' + slide.stepTitle + '</h2>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-5 md:p-6">' +
+                        '<p class="text-slate-300 text-base md:text-lg leading-relaxed">' + slide.lead + '</p>' +
+                    '</div>' +
+                    '<ul class="grid grid-cols-1 md:grid-cols-2 gap-3">' + points + '</ul>' +
+                '</div>';
+            }
+
+            if (slide.layout === 'sentence') {
+                const formula = slide.formula.replace(/\[([^\]]+)\]/g, '<span class="text-orange-400 font-semibold">[$1]</span>');
+                return '<div class="flex flex-col gap-6 max-w-4xl mx-auto py-2 w-full">' +
+                    kicker(slide.kicker) + heading(slide.slideTitle) +
+                    '<div class="bg-gray-900/60 border border-orange-500/30 rounded-2xl p-6 md:p-8 mt-1">' +
+                        '<p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">The Formula</p>' +
+                        '<p class="text-xl md:text-3xl font-serif leading-relaxed text-white">' + formula + '</p>' +
+                    '</div>' +
+                    '<div class="bg-gray-900/40 border border-gray-800 rounded-2xl p-6">' +
+                        '<p class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> ' + slide.exampleLabel + '</p>' +
+                        '<p class="text-slate-300 text-lg md:text-xl leading-relaxed italic">"' + slide.example + '"</p>' +
+                    '</div>' +
+                    noteBox(slide.turn) + '</div>';
+            }
+
+            if (slide.layout === 'parts') {
+                const rows = slide.parts.map(p =>
+                    '<div class="flex items-start gap-4 bg-gray-900/50 border border-gray-800 rounded-2xl p-4 md:p-5 hover:border-orange-500/30 transition">' +
+                        '<div class="h-10 w-10 shrink-0 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold">' + p.n + '</div>' +
+                        '<div>' +
+                            '<h3 class="text-lg md:text-xl font-bold text-white">' + p.title + '</h3>' +
+                            '<p class="text-slate-300 text-sm md:text-base leading-relaxed">' + p.text + '</p>' +
+                        '</div>' +
+                    '</div>'
+                ).join('');
+                return '<div class="flex flex-col gap-4 max-w-4xl mx-auto py-2 w-full">' +
+                    kicker(slide.kicker) + heading(slide.slideTitle) +
+                    '<div class="flex flex-col gap-3 mt-1">' + rows + '</div></div>';
+            }
+
+            if (slide.layout === 'classify' || slide.layout === 'action') {
+                const theme = {
+                    green: { border: 'border-emerald-500/30', bg: 'bg-emerald-950/20', label: 'text-emerald-300', dot: 'bg-emerald-500' },
+                    yellow: { border: 'border-amber-500/30', bg: 'bg-amber-950/20', label: 'text-amber-300', dot: 'bg-amber-500' },
+                    red: { border: 'border-rose-500/30', bg: 'bg-rose-950/20', label: 'text-rose-300', dot: 'bg-rose-500' }
+                };
+                const cards = slide.levels.map(l => {
+                    const t = theme[l.color] || theme.green;
+                    const body = (slide.layout === 'classify')
+                        ? '<h3 class="text-lg md:text-xl font-bold text-white">' + l.subtitle + '</h3>' +
+                          '<p class="text-slate-300 text-sm md:text-base leading-relaxed">' + l.text + '</p>' +
+                          '<p class="text-slate-200 text-sm md:text-base leading-relaxed mt-auto pt-2 border-t border-gray-800/60"><span class="font-bold ' + t.label + '">Next: </span>' + l.next.replace(/^Next:\s*/, '') + '</p>'
+                        : '<ul class="space-y-2">' +
+                          l.items.map(it => '<li class="flex items-start gap-2"><i class="fa-solid fa-circle-check ' + t.label + ' text-xs mt-1.5"></i><span class="text-slate-200 text-sm md:text-base leading-relaxed">' + it + '</span></li>').join('') +
+                          '</ul>';
+                    return '<div class="' + t.bg + ' border ' + t.border + ' rounded-2xl p-5 md:p-6 flex flex-col gap-3">' +
+                        '<div class="flex items-center gap-2"><span class="h-3 w-3 rounded-full ' + t.dot + '"></span><span class="text-sm font-bold tracking-widest ' + t.label + '">' + l.label + '</span></div>' +
+                        body +
+                    '</div>';
+                }).join('');
+                return '<div class="flex flex-col gap-4 max-w-5xl mx-auto py-2 w-full">' +
+                    kicker(slide.kicker) + heading(slide.slideTitle) +
+                    '<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-2">' + cards + '</div></div>';
+            }
+
+            if (slide.layout === 'thankyou') {
+                return '<div class="flex flex-col items-center justify-center text-center gap-5 relative py-4 max-w-4xl mx-auto">' +
+                        '<div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-orange-500/10 blur-3xl pointer-events-none"></div>' +
+                        '<div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>' +
+                        '<span class="kicker text-xs font-bold text-orange-500 uppercase tracking-widest flex items-center gap-2">' +
+                            '<span class="h-2 w-2 rounded-full bg-orange-500 animate-ping"></span> FREELANCING COACHING</span>' +
+                        '<h2 class="text-5xl md:text-7xl font-serif font-bold text-white leading-tight">' + slide.heading + '</h2>' +
+                        '<div class="h-1.5 w-24 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>' +
+                        '<p class="text-slate-300 text-lg md:text-2xl leading-relaxed max-w-2xl">' + slide.message + '</p>' +
+                        '<div class="relative z-10 mt-4 flex items-center gap-3 bg-gray-900/60 border border-gray-800 px-6 py-3 rounded-2xl">' +
+                            '<i class="fa-solid fa-hands-clapping text-orange-500 text-xl"></i>' +
+                            '<span class="text-white font-bold text-lg">' + slide.presenter + '</span>' +
+                        '</div>' +
+                        '<div class="relative z-10 flex flex-col items-center gap-2 bg-white px-5 py-4 rounded-2xl shadow-xl">' +
+                            '<img src="' + slide.qr + '" class="qr-img h-32 w-32 md:h-40 md:w-40" alt="QR code">' +
+                            '<p class="text-[10px] uppercase tracking-wider text-gray-700 font-bold">Scan to open the slides</p>' +
+                        '</div>' +
+                    '</div>';
+            }
+
+            return '';
+        }
+
+        function buildSidebarNav() {
+            const nav = document.getElementById('slide-list-nav');
+            nav.innerHTML = '';
+            slidesData.forEach((slide, index) => {
+                const item = document.createElement('button');
+                item.className = 'nav-item w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition flex items-center gap-3 active:scale-[0.98] text-slate-400 hover:bg-gray-800/60';
+                item.innerHTML = '<span class="h-5 w-5 rounded-full bg-gray-800 text-slate-300 flex items-center justify-center font-mono text-[10px] border border-gray-700 font-bold">' + (index + 1) + '</span>' +
+                    '<span class="truncate">' + slide.title + '</span>';
+                item.onclick = function () { renderSlide(index); };
+                nav.appendChild(item);
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < slidesData.length - 1) renderSlide(currentSlideIndex + 1);
+            else renderSlide(0);
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) renderSlide(currentSlideIndex - 1);
+            else renderSlide(slidesData.length - 1);
+        }
+
+        function toggleFullscreen() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().then(() => document.body.classList.add('fullscreen-mode'))
+                    .catch(err => console.error('Error attempting to enable fullscreen: ' + err.message));
+            } else {
+                document.exitFullscreen();
+                document.body.classList.remove('fullscreen-mode');
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) document.body.classList.add('fullscreen-mode');
+            else document.body.classList.remove('fullscreen-mode');
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') {
+                event.preventDefault();
+                nextSlide();
+            } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                prevSlide();
+            }
+        });
+
+        let touchstartX = 0;
+        let touchendX = 0;
+        const gestureZone = document.getElementById('slide-viewport');
+        gestureZone.addEventListener('touchstart', function (event) { touchstartX = event.changedTouches[0].screenX; }, false);
+        gestureZone.addEventListener('touchend', function (event) { touchendX = event.changedTouches[0].screenX; handleGesture(); }, false);
+        function handleGesture() {
+            if (touchendX < touchstartX - 50) nextSlide();
+            if (touchendX > touchstartX + 50) prevSlide();
+        }
+    </script>
+</body>
+</html>
+
+
